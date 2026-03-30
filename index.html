@@ -1,34 +1,301 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Optimized Index</title>
-    <meta name="description" content="This is an optimized index page for better performance, SEO, accessibility, and code structure.">
-    <meta name="keywords" content="optimization, SEO, accessibility, performance">
-    <meta name="robots" content="index, follow">
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI 個性化架構師 - 由 Perplexity Pro 驅動，通過 12 個維度問卷生成你專屬的 AI 系統提示詞">
+<meta name="keywords" content="AI, 提示詞, 個性化, Perplexity, 架構師">
+<title>AI 個性化架構師 — Perplexity Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;height:100%;transition:background-color 0.4s cubic-bezier(0.16,1,0.3,1),color 0.4s cubic-bezier(0.16,1,0.3,1)}
+
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;
+  --color-surface:#f9f8f5;
+  --color-surface-2:#fbfbf9;
+  --color-surface-offset:#f0ede8;
+  --color-border:oklch(0.3 0.01 80 / 0.12);
+  --color-divider:#dcd9d5;
+  --color-text:#28251d;
+  --color-text-muted:#7a7974;
+  --color-text-faint:#bab9b4;
+  --color-primary:#20aadb;
+  --color-primary-hover:#1890bb;
+  --color-primary-glow:oklch(0.65 0.12 220 / 0.15);
+  --color-secondary:#01696f;
+  --color-accent-purple:#7a39bb;
+  --color-success:#437a22;
+  --color-warning:#964219;
+  --color-error:#a12c7b;
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80/0.06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80/0.08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80/0.12);
+  --shadow-glow:0 0 24px oklch(0.65 0.12 220/0.2);
+  --radius-sm:0.375rem;
+  --radius-md:0.5rem;
+  --radius-lg:0.75rem;
+  --radius-xl:1rem;
+  --radius-2xl:1.5rem;
+  --radius-full:9999px;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+  --font-body:'Noto Sans TC','Inter',sans-serif;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --space-1:0.25rem;--space-2:0.5rem;--space-3:0.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;
+  --space-12:3rem;--space-16:4rem;
+}
+
+[data-theme="dark"]{
+  --color-bg:#0d0f12;
+  --color-surface:#141519;
+  --color-surface-2:#1a1c21;
+  --color-surface-offset:#1e2026;
+  --color-border:oklch(1 0 0 / 0.08);
+  --color-divider:#2a2c32;
+  --color-text:#e8eaed;
+  --color-text-muted:#8b8f96;
+  --color-text-faint:#4a4e56;
+  --color-primary:#20aadb;
+  --color-primary-hover:#3bbfe8;
+  --color-primary-glow:oklch(0.65 0.12 220 / 0.2);
+  --color-secondary:#4f98a3;
+  --color-accent-purple:#a86fdf;
+  --color-success:#6daa45;
+  --color-warning:#bb653b;
+  --color-error:#d163a7;
+  --shadow-sm:0 1px 2px oklch(0 0 0/0.3);
+  --shadow-md:0 4px 16px oklch(0 0 0/0.4);
+  --shadow-lg:0 16px 48px oklch(0 0 0/0.5);
+  --shadow-glow:0 0 40px oklch(0.65 0.12 220/0.25);
+}
+
+body{
+  min-height:100dvh;
+  font-family:var(--font-body);
+  font-size:var(--text-base);
+  color:var(--color-text);
+  background:var(--color-bg);
+  line-height:1.65;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:var(--space-6) var(--space-4);
+  background-image:radial-gradient(ellipse 80% 60% at 50% -20%,oklch(0.65 0.12 220/0.08),transparent);
+  transition:background-color 0.4s cubic-bezier(0.16,1,0.3,1),background-image 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+
+.app-wrapper{width:100%;max-width:760px;display:flex;flex-direction:column;gap:var(--space-6);}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) 0;}
+
+.logo{display:flex;align-items:center;gap:var(--space-3);}
+
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--color-primary),var(--color-accent-purple));border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow-glow);}
+
+.logo-text{font-size:var(--text-sm);font-weight:600;color:var(--color-text);line-height:1.2;}
+
+.logo-sub{font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;}
+
+.theme-toggle{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:var(--space-2) var(--space-3);color:var(--color-text-muted);cursor:pointer;font-size:var(--text-xs);display:flex;align-items:center;gap:var(--space-2);transition:color var(--transition),background var(--transition),border-color var(--transition),transform 0.6s cubic-bezier(0.16,1,0.3,1);}
+.theme-toggle:hover{color:var(--color-text);background:var(--color-surface-2);}
+.theme-toggle:disabled{opacity:0.6;cursor:not-allowed;}
+
+.progress-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-4) var(--space-5);box-shadow:var(--shadow-sm);}
+
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3);}
+
+.progress-label{font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em;}
+
+.progress-fraction{font-size:var(--text-xs);color:var(--color-primary);font-weight:700;font-variant-numeric:tabular-nums;}
+
+.progress-track{height:6px;background:var(--color-surface-offset);border-radius:var(--radius-full);overflow:hidden;}
+
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--color-primary),var(--color-accent-purple));border-radius:var(--radius-full);transition:width 0.5s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 8px var(--color-primary-glow);will-change:width;}
+
+.progress-steps{display:flex;gap:var(--space-2);margin-top:var(--space-3);flex-wrap:wrap;}
+
+.step-dot{width:8px;height:8px;border-radius:var(--radius-full);background:var(--color-surface-offset);transition:background var(--transition),transform var(--transition);flex-shrink:0;}
+.step-dot.done{background:var(--color-primary);}
+.step-dot.active{background:var(--color-primary);transform:scale(1.5);box-shadow:0 0 6px var(--color-primary-glow);}
+
+.chat-container{display:flex;flex-direction:column;gap:var(--space-4);min-height:300px;}
+
+.message{display:flex;gap:var(--space-3);opacity:0;animation:msg-in 0.4s cubic-bezier(0.16,1,0.3,1) forwards;}
+
+@keyframes msg-in{from{opacity:0;clip-path:inset(10% 0 0 0);}to{opacity:1;clip-path:inset(0 0 0 0);}}
+
+@keyframes msg-out{from{opacity:1;clip-path:inset(0 0 0 0);transform:translateY(0);}to{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(20px);}}
+
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+.message.user{flex-direction:row-reverse;}
+
+.msg-avatar{width:32px;height:32px;border-radius:var(--radius-full);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;margin-top:2px;}
+
+.msg-avatar.ai{background:linear-gradient(135deg,var(--color-primary),var(--color-accent-purple));color:#fff;box-shadow:0 2px 8px var(--color-primary-glow);}
+
+.msg-avatar.user-av{background:var(--color-surface-offset);color:var(--color-text-muted);border:1px solid var(--color-border);}
+
+.msg-bubble{max-width:82%;padding:var(--space-4) var(--space-5);border-radius:var(--radius-xl);line-height:1.65;font-size:var(--text-base);}
+
+.msg-bubble.ai{background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);border-top-left-radius:var(--radius-sm);}
+
+.msg-bubble.user{background:linear-gradient(135deg,oklch(from var(--color-primary) l c h / 0.15),oklch(from var(--color-accent-purple) l c h / 0.1));border:1px solid oklch(from var(--color-primary) l c h / 0.25);border-top-right-radius:var(--radius-sm);text-align:right;}
+
+.msg-meta{font-size:var(--text-xs);color:var(--color-text-faint);margin-top:var(--space-2);}
+
+.dim-tag{display:inline-flex;align-items:center;gap:var(--space-1);background:oklch(from var(--color-primary) l c h / 0.12);color:var(--color-primary);font-size:var(--text-xs);font-weight:600;padding:var(--space-1) var(--space-3);border-radius:var(--radius-full);margin-bottom:var(--space-3);border:1px solid oklch(from var(--color-primary) l c h / 0.2);}
+
+.options-section{display:flex;flex-direction:column;gap:var(--space-3);transition:opacity 0.2s ease-in-out;}
+
+.options-title{font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;padding-left:44px;}
+
+.options-grid{display:flex;flex-direction:column;gap:var(--space-2);padding-left:44px;}
+
+.option-btn{display:flex;align-items:flex-start;gap:var(--space-3);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);cursor:pointer;text-align:left;color:var(--color-text);font-family:var(--font-body);font-size:var(--text-sm);transition:background var(--transition),border-color var(--transition),box-shadow var(--transition),transform var(--transition);line-height:1.5;}
+
+.option-btn:hover{background:var(--color-surface-2);border-color:oklch(from var(--color-primary) l c h / 0.35);box-shadow:0 0 0 3px var(--color-primary-glow);transform:translateY(-1px);}
+
+.option-btn:active{transform:translateY(0);}
+
+.option-btn.selected{background:oklch(from var(--color-primary) l c h / 0.1);border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-glow),var(--shadow-sm);}
+
+.option-key{display:flex;align-items:center;justify-content:center;min-width:28px;height:28px;background:var(--color-surface-offset);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:700;color:var(--color-text-muted);flex-shrink:0;border:1px solid var(--color-border);transition:background var(--transition),color var(--transition),border-color var(--transition);}
+
+.option-btn.selected .option-key,.option-btn:hover .option-key{background:var(--color-primary);color:#fff;border-color:var(--color-primary);}
+
+.option-text{flex:1;padding-top:2px;}
+
+.option-label{font-weight:600;margin-bottom:2px;color:var(--color-text);}
+
+.option-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.45;}
+
+.custom-input-section{display:flex;gap:var(--space-2);padding-left:44px;margin-top:var(--space-1);}
+
+.custom-input{flex:1;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-4);color:var(--color-text);font-family:var(--font-body);font-size:var(--text-sm);outline:none;transition:border-color var(--transition),box-shadow var(--transition);}
+
+.custom-input::placeholder{color:var(--color-text-faint);}
+.custom-input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-glow);}
+.custom-input:disabled{opacity:0.5;cursor:not-allowed;}
+
+.send-btn{background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-lg);padding:var(--space-3) var(--space-5);cursor:pointer;font-family:var(--font-body);font-size:var(--text-sm);font-weight:600;display:flex;align-items:center;gap:var(--space-2);transition:background var(--transition),box-shadow var(--transition),transform var(--transition);white-space:nowrap;}
+.send-btn:hover{background:var(--color-primary-hover);box-shadow:var(--shadow-glow);transform:translateY(-1px);}
+.send-btn:active{transform:translateY(0);}
+.send-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+.typing{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) 0;opacity:0;transition:opacity 0.3s;}
+.typing.visible{opacity:1;}
+.typing-dots{display:flex;gap:4px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);border-top-left-radius:var(--radius-sm);padding:var(--space-3) var(--space-4);box-shadow:var(--shadow-sm);}
+.dot{width:6px;height:6px;border-radius:var(--radius-full);background:var(--color-text-muted);animation:bounce 1.4s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5;}40%{transform:scale(1.2);opacity:1;}}
+
+.result-section{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-2xl);padding:var(--space-8);box-shadow:var(--shadow-lg);display:none;}
+.result-section.visible{display:block;animation:msg-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards;}
+
+.result-header{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-6);padding-bottom:var(--space-4);border-bottom:1px solid var(--color-divider);}
+
+.result-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--color-primary),var(--color-accent-purple));border-radius:var(--radius-xl);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-glow);font-size:22px;}
+
+.result-title{font-size:var(--text-lg);font-weight:700;color:var(--color-text);line-height:1.2;}
+.result-subtitle{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:2px;}
+
+.code-block{background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-5);font-family:'Menlo','Consolas','Courier New',monospace;font-size:0.8rem;line-height:1.7;color:var(--color-text);white-space:pre-wrap;word-break:break-word;position:relative;max-height:400px;overflow-y:auto;}
+
+.copy-btn{position:sticky;top:0;float:right;background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-md);padding:var(--space-1) var(--space-3);font-size:var(--text-xs);font-weight:600;cursor:pointer;margin-bottom:var(--space-2);margin-left:var(--space-2);transition:background var(--transition),color var(--transition),transform var(--transition);}
+.copy-btn:hover{background:var(--color-primary-hover);}
+.copy-btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+.restart-btn{display:flex;align-items:center;gap:var(--space-2);background:transparent;border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-3) var(--space-5);color:var(--color-text-muted);cursor:pointer;font-family:var(--font-body);font-size:var(--text-sm);transition:color var(--transition),border-color var(--transition),background var(--transition);margin-top:var(--space-4);}
+.restart-btn:hover{color:var(--color-text);border-color:var(--color-text-muted);background:var(--color-surface-2);}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--color-divider);border-radius:var(--radius-full);}
+::-webkit-scrollbar-thumb:hover{background:var(--color-text-faint);}
+
+@media(max-width:600px){
+  body{padding:var(--space-4) var(--space-3);}
+  .msg-bubble{max-width:90%;}
+  .options-grid,.custom-input-section,.options-title{padding-left:0;}
+  .result-section{padding:var(--space-5);}
+  .code-block{font-size:0.72rem;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}
+}
+</style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Optimized Page</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Content Section</h2>
-            <p>This section includes content that is optimized for performance and accessibility.</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 Optimized Page. All rights reserved.</p>
-    </footer>
-    <script>
-        try {
-            // Example of optimized code
-            console.log('This is an optimized script.');
-        } catch (error) {
-            console.error('Error occurred:', error);
-        }
-    </script>
-</body>
-</html>
+
+<div class="app-wrapper">
+
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">AI 個性化架構師</div>
+        <div class="logo-sub">Powered by Perplexity Pro</div>
+      </div>
+    </div>
+    <button class="theme-toggle" data-theme-toggle aria-label="切換主題">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span id="theme-label">亮色</span>
+    </button>
+  </header>
+
+  <div class="progress-section" id="progress-section">
+    <div class="progress-header">
+      <span class="progress-label" id="progress-dim">🧠 準備開始</span>
+      <span class="progress-fraction" id="progress-frac">0 / 12</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-steps" id="progress-steps"></div>
+  </div>
+
+  <div class="chat-container" id="chat-container">
+    <div class="message" id="typing-row" style="opacity:1">
+      <div class="msg-avatar ai">P</div>
+      <div class="typing visible" id="typing-indicator">
+        <div class="typing-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="options-section" id="options-section" style="display:none">
+    <div class="options-title" id="options-title">選擇你的偏好</div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="custom-input-section" id="custom-input-section">
+      <input type="text" class="custom-input" id="custom-input" placeholder="或直接輸入你的想法…" />
+      <button class="send-btn" id="send-btn" disabled aria-label="送出自訂答案">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        送出
+      </button>
+    </div>
+  </div>
+
+  <div class="result-section" id="result-section">
+    <div class="result-header">
+      <div class="result-icon">✨</div>
+      <div>
+        <div class="result-title">你的專屬系統提示詞</div>
+        
