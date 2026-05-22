@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 金鑰管理器</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+
+:root,[data-theme="light"]{
+  --bg:#f7f6f2;
+  --surface:#f9f8f5;
+  --surface-2:#fbfbf9;
+  --surface-off:#f0ede8;
+  --border:oklch(0.3 0.01 80/0.12);
+  --divider:#dcd9d5;
+  --text:#28251d;
+  --text-muted:#7a7974;
+  --text-faint:#bab9b4;
+  --primary:#20aadb;
+  --primary-h:#1890bb;
+  --primary-glow:oklch(0.65 0.12 220/0.15);
+  --purple:#7a39bb;
+  --success:#437a22;
+  --warning:#964219;
+  --danger:#a12c7b;
+  --danger-glow:oklch(0.5 0.15 330/0.15);
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80/0.06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80/0.08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80/0.12);
+  --shadow-glow:0 0 24px oklch(0.65 0.12 220/0.2);
+  --r-sm:0.375rem;--r-md:0.5rem;--r-lg:0.75rem;--r-xl:1rem;--r-2xl:1.5rem;--r-full:9999px;
+  --tr:180ms cubic-bezier(0.16,1,0.3,1);
+  --font:'Noto Sans TC','Inter',sans-serif;
+}
+
+[data-theme="dark"]{
+  --bg:#0d0f12;
+  --surface:#141519;
+  --surface-2:#1a1c21;
+  --surface-off:#1e2026;
+  --border:oklch(1 0 0/0.08);
+  --divider:#2a2c32;
+  --text:#e8eaed;
+  --text-muted:#8b8f96;
+  --text-faint:#4a4e56;
+  --primary:#20aadb;
+  --primary-h:#3bbfe8;
+  --primary-glow:oklch(0.65 0.12 220/0.2);
+  --purple:#a86fdf;
+  --success:#6daa45;
+  --warning:#bb653b;
+  --danger:#d163a7;
+  --danger-glow:oklch(0.5 0.15 330/0.2);
+  --shadow-sm:0 1px 2px oklch(0 0 0/0.3);
+  --shadow-md:0 4px 16px oklch(0 0 0/0.4);
+  --shadow-lg:0 16px 48px oklch(0 0 0/0.5);
+  --shadow-glow:0 0 40px oklch(0.65 0.12 220/0.25);
+}
+
+body{
+  min-height:100dvh;
+  font-family:var(--font);
+  font-size:1rem;
+  color:var(--text);
+  background:var(--bg);
+  background-image:radial-gradient(ellipse 80% 60% at 50% -20%,oklch(0.65 0.12 220/0.08),transparent);
+  display:flex;flex-direction:column;align-items:center;
+  padding:1.5rem 1rem;
+  transition:background-color 0.4s,color 0.4s;
+}
+
+.app{width:100%;max-width:860px;display:flex;flex-direction:column;gap:1.25rem;}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;}
+.logo{display:flex;align-items:center;gap:0.75rem;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--purple));border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-glow);}
+.logo-text{font-size:1.15rem;font-weight:700;}
+.logo-sub{font-size:0.78rem;color:var(--text-muted);}
+.header-actions{display:flex;gap:0.5rem;align-items:center;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;border:1px solid var(--border);border-radius:var(--r-lg);padding:0.5rem 1rem;cursor:pointer;font-family:var(--font);font-size:0.85rem;font-weight:600;transition:all var(--tr);white-space:nowrap;}
+.btn-ghost{background:var(--surface);color:var(--text-muted);}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text);}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-h);box-shadow:var(--shadow-glow);}
+.btn-danger{background:transparent;color:var(--danger);border-color:var(--danger-glow);}
+.btn-danger:hover{background:var(--danger-glow);border-color:var(--danger);}
+.btn-success{background:var(--success);color:#fff;border-color:var(--success);}
+.btn-sm{padding:0.3rem 0.65rem;font-size:0.78rem;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.btn:active{transform:scale(0.97);}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:0.75rem 1.25rem;box-shadow:var(--shadow-sm);flex-wrap:wrap;}
+.stat{display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text-muted);}
+.stat-val{font-weight:700;font-size:0.95rem;color:var(--text);}
+.stat-dot{width:8px;height:8px;border-radius:50%;}
+.stat-dot.blue{background:var(--primary);}
+.stat-dot.purple{background:var(--purple);}
+.stat-dot.green{background:var(--success);}
+
+/* Search & Filter */
+.toolbar{display:flex;gap:0.75rem;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:180px;}
+.search-wrap svg{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-faint);pointer-events:none;}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:0.6rem 0.75rem 0.6rem 2.4rem;color:var(--text);font-family:var(--font);font-size:0.9rem;outline:none;transition:border-color var(--tr),box-shadow var(--tr);}
+.search-input::placeholder{color:var(--text-faint);}
+.search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:0.6rem 0.75rem;color:var(--text);font-family:var(--font);font-size:0.85rem;outline:none;cursor:pointer;transition:border-color var(--tr);}
+.filter-select:focus{border-color:var(--primary);}
+
+/* Key list */
+.key-list{display:flex;flex-direction:column;gap:0.5rem;}
+
+.key-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;transition:border-color var(--tr),box-shadow var(--tr);box-shadow:var(--shadow-sm);}
+.key-card:hover{border-color:oklch(from var(--primary) l c h/0.35);box-shadow:var(--shadow-md);}
+
+.key-category-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.key-info{flex:1;min-width:0;}
+.key-name{font-weight:700;font-size:0.95rem;color:var(--text);display:flex;align-items:center;gap:0.5rem;}
+.key-badge{font-size:0.68rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:var(--r-full);text-transform:uppercase;letter-spacing:0.05em;}
+.key-desc{font-size:0.8rem;color:var(--text-muted);margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.key-value-row{display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;}
+.key-value{font-family:'Menlo','Consolas',monospace;font-size:0.82rem;color:var(--text-muted);background:var(--surface-off);border:1px solid var(--border);border-radius:var(--r-md);padding:0.2rem 0.6rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.key-value.revealed{color:var(--text);}
+
+.key-actions{display:flex;gap:0.4rem;flex-shrink:0;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text-muted);}
+.empty-icon{font-size:3rem;margin-bottom:0.75rem;}
+.empty-text{font-size:1rem;font-weight:600;margin-bottom:0.4rem;}
+.empty-sub{font-size:0.85rem;}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:oklch(0 0 0/0.6);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-backdrop.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:1.75rem;width:100%;max-width:500px;box-shadow:var(--shadow-lg);transform:scale(0.95);transition:transform 0.25s cubic-bezier(0.16,1,0.3,1);}
+.modal-backdrop.open .modal{transform:scale(1);}
+.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.6rem;}
+.modal-title svg{color:var(--primary);}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;margin-bottom:1rem;}
+label{font-size:0.82rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;}
+.form-input,.form-select,.form-textarea{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:0.65rem 0.85rem;color:var(--text);font-family:var(--font);font-size:0.9rem;outline:none;transition:border-color var(--tr),box-shadow var(--tr);width:100%;}
+.form-input::placeholder{color:var(--text-faint);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+.form-textarea{resize:vertical;min-height:72px;font-size:0.85rem;font-family:'Menlo','Consolas',monospace;}
+.form-select{cursor:pointer;}
+.password-wrap{position:relative;}
+.password-wrap .form-input{padding-right:3rem;}
+.eye-btn{position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-faint);cursor:pointer;padding:0.2rem;display:flex;align-items:center;transition:color var(--tr);}
+.eye-btn:hover{color:var(--text);}
+.modal-actions{display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--divider);}
+
+/* Export modal */
+.export-code{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:1rem;font-family:'Menlo','Consolas',monospace;font-size:0.8rem;line-height:1.7;color:var(--text);white-space:pre;overflow-x:auto;max-height:300px;overflow-y:auto;margin:0.75rem 0;}
+.export-tabs{display:flex;gap:0.5rem;margin-bottom:0.75rem;}
+.tab-btn{background:var(--surface-off);border:1px solid var(--border);border-radius:var(--r-md);padding:0.3rem 0.8rem;font-size:0.8rem;font-weight:600;cursor:pointer;color:var(--text-muted);transition:all var(--tr);}
+.tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* Confirm modal */
+.confirm-msg{font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.55;}
+.confirm-key{font-weight:700;color:var(--text);}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:200;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:0.65rem 1rem;font-size:0.85rem;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:0.5rem;animation:toast-in 0.3s cubic-bezier(0.16,1,0.3,1) forwards;pointer-events:all;}
+@keyframes toast-in{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.toast-fade{animation:toast-out 0.3s forwards;}
+@keyframes toast-out{to{opacity:0;transform:translateY(8px);}}
+.toast.ok{border-color:var(--success);color:var(--success);}
+.toast.err{border-color:var(--danger);color:var(--danger);}
+.toast.info{border-color:var(--primary);color:var(--primary);}
+
+/* Category colors */
+.cat-openai{background:#10b981;}
+.cat-anthropic{background:#a86fdf;}
+.cat-google{background:#4285f4;}
+.cat-aws{background:#ff9900;}
+.cat-azure{background:#0089d6;}
+.cat-custom{background:#8b8f96;}
+
+.badge-openai{background:oklch(0.6 0.15 160/0.15);color:#10b981;}
+.badge-anthropic{background:oklch(0.6 0.15 295/0.15);color:#a86fdf;}
+.badge-google{background:oklch(0.6 0.12 260/0.15);color:#4285f4;}
+.badge-aws{background:oklch(0.7 0.15 60/0.15);color:#ff9900;}
+.badge-azure{background:oklch(0.6 0.12 240/0.15);color:#0089d6;}
+.badge-custom{background:var(--surface-off);color:var(--text-muted);}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--divider);border-radius:9999px;}
+
+@media(max-width:580px){
+  .key-card{flex-wrap:wrap;}
+  .key-actions{width:100%;justify-content:flex-end;}
+  .stats-bar{gap:0.6rem;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">API 金鑰管理器</div>
+        <div class="logo-sub">安全存儲・隨時匯出・跨機同步</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" id="import-btn" title="從 .env 匯入">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        匯入
+      </button>
+      <button class="btn btn-ghost btn-sm" id="export-btn" title="匯出環境變數">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        匯出
+      </button>
+      <button class="btn btn-primary btn-sm" id="add-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新增金鑰
+      </button>
+      <button class="btn btn-ghost btn-sm" id="theme-btn" title="切換主題">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat"><div class="stat-dot blue"></div><span>總計</span><span class="stat-val" id="stat-total">0</span></div>
+    <div class="stat"><div class="stat-dot green"></div><span>服務數</span><span class="stat-val" id="stat-cats">0</span></div>
+    <div class="stat"><div class="stat-dot purple"></div><span>最近新增</span><span class="stat-val" id="stat-recent">—</span></div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="search-input" placeholder="搜尋金鑰名稱或說明…">
+    </div>
+    <select class="filter-select" id="filter-cat">
+      <option value="">所有分類</option>
+      <option value="openai">OpenAI</option>
+      <option value="anthropic">Anthropic</option>
+      <option value="google">Google</option>
+      <option value="aws">AWS</option>
+      <option value="azure">Azure</option>
+      <option value="custom">其他</option>
+    </select>
+  </div>
+
+  <!-- Key List -->
+  <div class="key-list" id="key-list"></div>
+
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-backdrop" id="form-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span id="form-title">新增 API 金鑰</span>
+    </div>
+    <div class="form-group">
+      <label>金鑰名稱 *</label>
+      <input type="text" class="form-input" id="f-name" placeholder="例如：OPENAI_API_KEY">
+    </div>
+    <div class="form-group">
+      <label>金鑰值 *</label>
+      <div class="password-wrap">
+        <input type="password" class="form-input" id="f-value" placeholder="sk-…">
+        <button class="eye-btn" id="f-eye" tabindex="-1" title="顯示/隱藏">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>服務分類</label>
+      <select class="form-select" id="f-cat">
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic</option>
+        <option value="google">Google</option>
+        <option value="aws">AWS</option>
+        <option value="azure">Azure</option>
+        <option value="custom">其他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>說明（選填）</label>
+      <input type="text" class="form-input" id="f-desc" placeholder="例如：Production 用途，2025 年到期">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="form-cancel">取消</button>
+      <button class="btn btn-primary" id="form-save">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        儲存
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-backdrop" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      確認刪除
+    </div>
+    <p class="confirm-msg">確定要刪除 <span class="confirm-key" id="confirm-key-name"></span> 嗎？此操作無法復原。</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirm-cancel">取消</button>
+      <button class="btn btn-danger" id="confirm-ok">刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-backdrop" id="export-modal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      匯出環境變數
+    </div>
+    <div class="export-tabs" id="export-tabs">
+      <button class="tab-btn active" data-fmt="bash">Bash / Zsh</button>
+      <button class="tab-btn" data-fmt="fish">Fish Shell</button>
+      <button class="tab-btn" data-fmt="dotenv">.env 檔案</button>
+      <button class="tab-btn" data-fmt="powershell">PowerShell</button>
+    </div>
+    <pre class="export-code" id="export-code"></pre>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="export-close">關閉</button>
+      <button class="btn btn-ghost" id="export-save-file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        下載檔案
+      </button>
+      <button class="btn btn-primary" id="export-copy">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        複製全部
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-backdrop" id="import-modal">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      匯入 .env 或 export 格式
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">貼上 <code style="background:var(--surface-off);padding:0.1rem 0.3rem;border-radius:4px;">.env</code> 內容或 <code style="background:var(--surface-off);padding:0.1rem 0.3rem;border-radius:4px;">export KEY=value</code> 格式，每行一筆。</p>
+    <textarea class="form-textarea" id="import-text" style="min-height:140px" placeholder="OPENAI_API_KEY=sk-...&#10;ANTHROPIC_API_KEY=sk-ant-...&#10;export GOOGLE_API_KEY=AIza..."></textarea>
+    <div class="form-group" style="margin-top:0.75rem;margin-bottom:0;">
+      <label>預設分類</label>
+      <select class="form-select" id="import-cat">
+        <option value="custom">其他（依名稱自動辨識）</option>
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic</option>
+        <option value="google">Google</option>
+        <option value="aws">AWS</option>
+        <option value="azure">Azure</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="import-cancel">取消</button>
+      <button class="btn btn-primary" id="import-ok">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        匯入
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ─── Storage ───────────────────────────────────────────────────────────────
+const STORE_KEY = 'api_manager_keys_v1';
+
+function loadKeys() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch { return []; }
+}
+function saveKeys(keys) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(keys));
+}
+
+let keys = loadKeys();
+
+// ─── Utils ──────────────────────────────────────────────────────────────────
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function mask(val) {
+  if (!val) return '';
+  if (val.length <= 8) return '•'.repeat(val.length);
+  return val.slice(0, 4) + '•'.repeat(Math.min(val.length - 8, 20)) + val.slice(-4);
+}
+function guessCategory(name) {
+  const n = name.toLowerCase();
+  if (n.includes('openai')) return 'openai';
+  if (n.includes('anthropic') || n.includes('claude')) return 'anthropic';
+  if (n.includes('google') || n.includes('gemini') || n.includes('gcp')) return 'google';
+  if (n.includes('aws') || n.includes('amazon')) return 'aws';
+  if (n.includes('azure') || n.includes('microsoft')) return 'azure';
+  return 'custom';
+}
+function catLabel(cat) {
+  const map = {openai:'OpenAI',anthropic:'Anthropic',google:'Google',aws:'AWS',azure:'Azure',custom:'其他'};
+  return map[cat] || cat;
+}
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  if (d < 60000) return '剛才';
+  if (d < 3600000) return Math.floor(d/60000) + ' 分鐘前';
+  if (d < 86400000) return Math.floor(d/3600000) + ' 小時前';
+  return Math.floor(d/86400000) + ' 天前';
+}
+
+// ─── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = {ok:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',err:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',info:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'};
+  t.innerHTML = (icons[type]||'') + msg;
+  wrap.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('toast-fade');
+    t.addEventListener('animationend', () => t.remove());
+  }, 2500);
+}
+
+// ─── Render ─────────────────────────────────────────────────────────────────
+const revealedIds = new Set();
+
+function renderList() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const cat = document.getElementById('filter-cat').value;
+  const list = document.getElementById('key-list');
+
+  let filtered = keys.filter(k => {
+    const matchQ = !q || k.name.toLowerCase().includes(q) || (k.desc||'').toLowerCase().includes(q);
+    const matchCat = !cat || k.cat === cat;
+    return matchQ && matchCat;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🔑</div>
+      <div class="empty-text">${keys.length === 0 ? '還沒有任何 API 金鑰' : '找不到符合的金鑰'}</div>
+      <div class="empty-sub">${keys.length === 0 ? '點擊「新增金鑰」開始管理你的 API 金鑰' : '試試不同的搜尋詞或分類篩選'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(k => {
+    const revealed = revealedIds.has(k.id);
+    const displayVal = revealed ? k.value : mask(k.value);
+    return `<div class="key-card" data-id="${k.id}">
+      <div class="key-category-dot cat-${k.cat}"></div>
+      <div class="key-info">
+        <div class="key-name">
+          ${escHtml(k.name)}
+          <span class="key-badge badge-${k.cat}">${catLabel(k.cat)}</span>
+        </div>
+        ${k.desc ? `<div class="key-desc">${escHtml(k.desc)}</div>` : ''}
+        <div class="key-value-row">
+          <div class="key-value ${revealed ? 'revealed' : ''}" title="${revealed ? escHtml(k.value) : ''}">${escHtml(displayVal)}</div>
+          <button class="btn btn-ghost btn-sm reveal-btn" data-id="${k.id}" title="${revealed ? '隱藏' : '顯示'}">
+            ${revealed
+              ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+              : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+            }
+          </button>
+          <button class="btn btn-ghost btn-sm copy-btn" data-id="${k.id}" title="複製">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="key-actions">
+        <button class="btn btn-ghost btn-sm edit-btn" data-id="${k.id}" title="編輯">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編輯
+        </button>
+        <button class="btn btn-danger btn-sm delete-btn" data-id="${k.id}" title="刪除">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          刪除
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateStats();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = keys.length;
+  const cats = new Set(keys.map(k => k.cat)).size;
+  document.getElementById('stat-cats').textContent = cats;
+  const last = keys.slice().sort((a,b) => b.ts - a.ts)[0];
+  document.getElementById('stat-recent').textContent = last ? timeAgo(last.ts) : '—';
+}
+
+// ─── Delegation: list actions ────────────────────────────────────────────────
+document.getElementById('key-list').addEventListener('click', e => {
+  const revealBtn = e.target.closest('.reveal-btn');
+  const copyBtn = e.target.closest('.copy-btn');
+  const editBtn = e.target.closest('.edit-btn');
+  const deleteBtn = e.target.closest('.delete-btn');
+
+  if (revealBtn) {
+    const id = revealBtn.dataset.id;
+    revealedIds.has(id) ? revealedIds.delete(id) : revealedIds.add(id);
+    renderList();
+  }
+  if (copyBtn) {
+    const id = copyBtn.dataset.id;
+    const k = keys.find(x => x.id === id);
+    if (k) navigator.clipboard.writeText(k.value).then(() => toast('已複製到剪貼簿'));
+  }
+  if (editBtn) openForm(editBtn.dataset.id);
+  if (deleteBtn) openConfirm(deleteBtn.dataset.id);
+});
+
+// ─── Form Modal ──────────────────────────────────────────────────────────────
+let editId = null;
+
+function openForm(id = null) {
+  editId = id;
+  const modal = document.getElementById('form-modal');
+  document.getElementById('form-title').textContent = id ? '編輯 API 金鑰' : '新增 API 金鑰';
+
+  if (id) {
+    const k = keys.find(x => x.id === id);
+    document.getElementById('f-name').value = k.name;
+    document.getElementById('f-value').value = k.value;
+    document.getElementById('f-cat').value = k.cat;
+    document.getElementById('f-desc').value = k.desc || '';
+  } else {
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-value').value = '';
+    document.getElementById('f-cat').value = 'custom';
+    document.getElementById('f-desc').value = '';
+  }
+  document.getElementById('f-value').type = 'password';
+  document.getElementById('eye-icon').innerHTML = EYE_OPEN;
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+}
+
+function closeForm() {
+  document.getElementById('form-modal').classList.remove('open');
+  editId = null;
+}
+
+document.getElementById('add-btn').addEventListener('click', () => openForm());
+document.getElementById('form-cancel').addEventListener('click', closeForm);
+document.getElementById('form-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeForm();
+});
+
+document.getElementById('form-save').addEventListener('click', () => {
+  const name = document.getElementById('f-name').value.trim();
+  const value = document.getElementById('f-value').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const desc = document.getElementById('f-desc').value.trim();
+
+  if (!name) { toast('請輸入金鑰名稱', 'err'); return; }
+  if (!value) { toast('請輸入金鑰值', 'err'); return; }
+
+  if (editId) {
+    keys = keys.map(k => k.id === editId ? {...k, name, value, cat, desc, updatedTs: Date.now()} : k);
+    toast('金鑰已更新');
+  } else {
+    if (keys.find(k => k.name === name)) {
+      toast('已存在相同名稱的金鑰', 'err'); return;
+    }
+    keys.push({id: uid(), name, value, cat, desc, ts: Date.now()});
+    toast('金鑰已新增');
+  }
+  saveKeys(keys);
+  closeForm();
+  renderList();
+});
+
+// Eye toggle
+const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+const EYE_CLOSED = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+document.getElementById('f-eye').addEventListener('click', () => {
+  const inp = document.getElementById('f-value');
+  const icon = document.getElementById('eye-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = EYE_CLOSED;
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = EYE_OPEN;
+  }
+});
+
+// Enter to save
+document.getElementById('f-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('form-save').click(); });
+document.getElementById('f-value').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('form-save').click(); });
+
+// ─── Confirm Delete Modal ────────────────────────────────────────────────────
+let deleteId = null;
+
+function openConfirm(id) {
+  deleteId = id;
+  const k = keys.find(x => x.id === id);
+  document.getElementById('confirm-key-name').textContent = k ? k.name : '';
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+  document.getElementById('confirm-modal').classList.remove('open');
+  deleteId = null;
+});
+document.getElementById('confirm-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) {
+    document.getElementById('confirm-modal').classList.remove('open');
+    deleteId = null;
+  }
+});
+document.getElementById('confirm-ok').addEventListener('click', () => {
+  if (!deleteId) return;
+  const name = keys.find(k => k.id === deleteId)?.name || '';
+  keys = keys.filter(k => k.id !== deleteId);
+  revealedIds.delete(deleteId);
+  saveKeys(keys);
+  document.getElementById('confirm-modal').classList.remove('open');
+  deleteId = null;
+  renderList();
+  toast(`已刪除 ${name}`);
+});
+
+// ─── Export Modal ─────────────────────────────────────────────────────────────
+let exportFmt = 'bash';
+
+function buildExport(fmt) {
+  if (keys.length === 0) return '# 沒有 API 金鑰可匯出';
+  const lines = {
+    bash:      ['#!/usr/bin/env bash', '# 由 API 金鑰管理器匯出', '', ...keys.map(k => `export ${k.name}="${k.value}"`)],
+    fish:      ['# 由 API 金鑰管理器匯出', '', ...keys.map(k => `set -gx ${k.name} "${k.value}"`)],
+    dotenv:    ['# 由 API 金鑰管理器匯出', '', ...keys.map(k => `${k.name}=${k.value}`)],
+    powershell:['# 由 API 金鑰管理器匯出', '', ...keys.map(k => `$env:${k.name} = "${k.value}"`)],
+  };
+  return (lines[fmt] || lines.bash).join('\n');
+}
+
+function fileExt(fmt) {
+  return {bash:'.sh',fish:'.fish',dotenv:'.env',powershell:'.ps1'}[fmt] || '.sh';
+}
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  exportFmt = 'bash';
+  document.querySelectorAll('#export-tabs .tab-btn').forEach(b => b.classList.toggle('active', b.dataset.fmt === exportFmt));
+  document.getElementById('export-code').textContent = buildExport(exportFmt);
+  document.getElementById('export-modal').classList.add('open');
+});
+document.getElementById('export-close').addEventListener('click', () => {
+  document.getElementById('export-modal').classList.remove('open');
+});
+document.getElementById('export-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('export-modal').classList.remove('open');
+});
+document.getElementById('export-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(buildExport(exportFmt)).then(() => toast('已複製到剪貼簿'));
+});
+document.getElementById('export-save-file').addEventListener('click', () => {
+  const content = buildExport(exportFmt);
+  const blob = new Blob([content], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'api-keys' + fileExt(exportFmt);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('檔案已下載');
+});
+document.querySelectorAll('#export-tabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    exportFmt = btn.dataset.fmt;
+    document.querySelectorAll('#export-tabs .tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.getElementById('export-code').textContent = buildExport(exportFmt);
+  });
+});
+
+// ─── Import Modal ─────────────────────────────────────────────────────────────
+document.getElementById('import-btn').addEventListener('click', () => {
+  document.getElementById('import-text').value = '';
+  document.getElementById('import-modal').classList.add('open');
+  setTimeout(() => document.getElementById('import-text').focus(), 50);
+});
+document.getElementById('import-cancel').addEventListener('click', () => {
+  document.getElementById('import-modal').classList.remove('open');
+});
+document.getElementById('import-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('import-modal').classList.remove('open');
+});
+document.getElementById('import-ok').addEventListener('click', () => {
+  const raw = document.getElementById('import-text').value;
+  const defaultCat = document.getElementById('import-cat').value;
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  let added = 0, skipped = 0;
+  for (const line of lines) {
+    const m = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=["']?(.+?)["']?\s*$/);
+    if (!m) continue;
+    const [, name, value] = m;
+    if (keys.find(k => k.name === name)) { skipped++; continue; }
+    const cat = defaultCat === 'custom' ? guessCategory(name) : defaultCat;
+    keys.push({id: uid(), name, value: value.replace(/^["']|["']$/g,''), cat, desc:'', ts: Date.now()});
+    added++;
+  }
+  saveKeys(keys);
+  document.getElementById('import-modal').classList.remove('open');
+  renderList();
+  if (added > 0) toast(`成功匯入 ${added} 筆${skipped ? `，跳過 ${skipped} 筆重複` : ''}`);
+  else toast(skipped ? `${skipped} 筆已存在，無新增` : '沒有可解析的內容', 'err');
+});
+
+// ─── Search & Filter ──────────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', renderList);
+document.getElementById('filter-cat').addEventListener('change', renderList);
+
+// ─── Theme Toggle ─────────────────────────────────────────────────────────────
+const html = document.documentElement;
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  html.dataset.theme = next;
+  localStorage.setItem('api_mgr_theme', next);
+});
+const savedTheme = localStorage.getItem('api_mgr_theme');
+if (savedTheme) html.dataset.theme = savedTheme;
+
+// ─── Keyboard shortcuts ───────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['form-modal','confirm-modal','export-modal','import-modal'].forEach(id => {
+      document.getElementById(id).classList.remove('open');
+    });
+    editId = null; deleteId = null;
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    openForm();
+  }
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+renderList();
+</script>
+</body>
+</html>
